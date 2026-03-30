@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TalePocket</title>
+<title>StoryBurrow</title>
 
 <style>
 body {
@@ -88,7 +88,10 @@ input {
 
 <div class="container">
 
-<h1>🌙 TalePocket</h1>
+<div style="text-align:center;">
+  <div style="font-size:32px;">🌙</div>
+  <img src="logo.png" alt="StoryBurrow Logo" style="width:180px; margin:10px 0;">
+</div>
 <p class="subtitle">A world of stories in your pocket</p>
 
 <div class="card">
