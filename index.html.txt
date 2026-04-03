@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StoryBurrow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #7b5cff, #b58cff, #f3d1ff);
+  margin: 0;
+  padding: 0;
+  color: #2d1f3f;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  padding: 15px;
+}
+
+.logo {
+  width: 260px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+}
+
+.subtitle {
+  text-align: center;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.subtext {
+  text-align: center;
+  color: white;
+  opacity: 0.8;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 18px;
+  margin: 15px 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin: 8px 0;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #7b5cff, #d96fff);
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.option {
+  display: inline-block;
+  padding: 10px 14px;
+  margin: 5px;
+  border-radius: 20px;
+  border: 2px solid #c9a7ff;
+  cursor: pointer;
+}
+
+.option.active {
+  background: linear-gradient(135deg, #7b5cff, #d96fff);
+  color: white;
+  border: none;
+}
+
+.section-title {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.hidden { display: none; }
+
+#storyText {
+  white-space: pre-line;
+  line-height: 1.7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div style="text-align:center;">
+  <img src="Logo.png.PNG" class="logo">
+</div>
+
+<h2 class="subtitle">🌙 A magical bedtime story, made just for your child</h2>
+<p class="subtext">Personalised. Calming. Ready in seconds.</p>
+
+<div class="card">
+
+<input id="name" placeholder="Child's Name">
+<input id="companion" placeholder="Optional: Companion">
+
+<button onclick="viewStories()" class="primary-btn">📚 My Story Library</button>
+
+<div class="section-title">Favourite Character</div>
+<div id="character">
+  <span class="option active" onclick="select(this,'character')">🐉 Dragon</span>
+  <span class="option" onclick="select(this,'character')">🦁 Lion</span>
+  <span class="option" onclick="select(this,'character')">🦄 Unicorn</span>
+  <span class="option" onclick="select(this,'character')">🐻 Bear</span>
+  <span class="option" onclick="select(this,'character')">🐺 Wolf</span>
+  <span class="option" onclick="select(this,'character')">🦊 Fox</span>
+  <span class="option" onclick="select(this,'character')">🐬 Dolphin</span>
+  <span class="option" onclick="select(this,'character')">🦋 Butterfly</span>
+  <span class="option" onclick="select(this,'character')">🐧 Penguin</span>
+  <span class="option" onclick="select(this,'character')">🐘 Elephant</span>
+  <span class="option" onclick="select(this,'character')">🦉 Owl</span>
+  <span class="option" onclick="select(this,'character')">🐸 Frog</span>
+  <span class="option" onclick="select(this,'character')">🦖 Dinosaur</span>
+</div>
+
+<div class="section-title">World</div>
+<div id="world">
+  <span class="option active" onclick="select(this,'world')">🌲 Enchanted Forest</span>
+  <span class="option" onclick="select(this,'world')">🚀 Space</span>
+  <span class="option" onclick="select(this,'world')">🏰 Castle Kingdom</span>
+  <span class="option" onclick="select(this,'world')">🌊 Ocean</span>
+  <span class="option" onclick="select(this,'world')">🎪 Magic Circus</span>
+  <span class="option" onclick="select(this,'world')">🌈 Dream World</span>
+  <span class="option" onclick="select(this,'world')">🏡 Cosy Village</span>
+  <span class="option" onclick="select(this,'world')">🏜 Desert Adventure</span>
+  <span class="option" onclick="select(this,'world')">❄️ Snowy Mountains</span>
+  <span class="option" onclick="select(this,'world')">🌋 Volcano Island</span>
+  <span class="option" onclick="select(this,'world')">🧙 Wizard School</span>
+  <span class="option" onclick="select(this,'world')">🚂 Adventure Train</span>
+</div>
+
+<div class="section-title">Story Type</div>
+<div id="type">
+  <span class="option active" onclick="select(this,'type')">🌙 Night</span>
+  <span class="option" onclick="select(this,'type')">☀️ Day</span>
+</div>
+
+<div class="section-title">Mood</div>
+<div id="mood">
+  <span class="option active" onclick="select(this,'mood')">😴 Calm bedtime</span>
+  <span class="option" onclick="select(this,'mood')">😂 Funny & silly</span>
+  <span class="option" onclick="select(this,'mood')">💪 Brave & inspiring</span>
+  <span class="option" onclick="select(this,'mood')">💖 Warm & cosy</span>
+</div>
+
+<div class="section-title">Length</div>
+<div id="length">
+  <span class="option active" onclick="select(this,'length')">Short (2–3 mins)</span>
+  <span class="option" onclick="select(this,'length')">Medium (5–6 mins)</span>
+  <span class="option" onclick="select(this,'length')">Long (8–10 mins)</span>
+</div>
+
+<button id="generateBtn" class="primary-btn" onclick="generateStory()">Create Story</button>
+
+<p style="font-size:12px; opacity:0.7; text-align:center;">
+✨ Loved by parents for calm, magical bedtime routines
+</p>
+
+<p id="loadingText" style="text-align:center;"></p>
+
+</div>
+
+<div id="storyCard" class="card hidden">
+  <h2 id="storyTitle"></h2>
+  <p id="storyText"></p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+    <button onclick="readStory()" class="primary-btn">▶️ Play</button>
+    <button onclick="pauseStory()" class="primary-btn">⏸ Pause</button>
+    <button onclick="resumeStory()" class="primary-btn">▶️ Resume</button>
+    <button onclick="stopStory()" class="primary-btn">⏹ Stop</button>
+  </div>
+
+  <button onclick="saveStory()" class="primary-btn">💾 Save Story</button>
+</div>
+
+<div id="libraryCard" class="card hidden">
+  <h3>📚 My Story Library</h3>
+  <div id="savedStoriesList"></div>
+</div>
+
+</div>
+
+<script>
+
+let currentSpeech = null;
+
+let selections = {
+  character: "Dragon",
+  world: "Enchanted Forest",
+  mood: "Calm bedtime",
+  type: "Night",
+  length: "Short"
+};
+
+function select(el, type) {
+  const parent = el.parentElement;
+  Array.from(parent.children).forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+  selections[type] = el.innerText.split(" (")[0];
+}
+
+function saveStory() {
+  const story = {
+    title: storyTitle.innerText,
+    text: storyText.innerText
+  };
+
+  let saved = JSON.parse(localStorage.getItem("stories") || "[]");
+  saved.push(story);
+  localStorage.setItem("stories", JSON.stringify(saved));
+  alert("Story saved!");
+}
+
+function viewStories() {
+  let saved = JSON.parse(localStorage.getItem("stories") || "[]");
+  const list = savedStoriesList;
+  list.innerHTML = "";
+
+  if (!saved.length) {
+    list.innerHTML = "<p>No saved stories yet.</p>";
+  } else {
+    saved.forEach((s, i) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <strong>${s.title}</strong><br><br>
+        <button onclick="loadStory(${i})" class="primary-btn">📖 Read</button>
+        <button onclick="deleteStory(${i})" class="primary-btn">🗑 Delete</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  libraryCard.classList.remove("hidden");
+}
+
+function loadStory(i) {
+  let saved = JSON.parse(localStorage.getItem("stories") || "[]");
+  storyTitle.innerText = saved[i].title;
+  storyText.innerText = saved[i].text;
+  storyCard.classList.remove("hidden");
+}
+
+function deleteStory(i) {
+  let saved = JSON.parse(localStorage.getItem("stories") || "[]");
+  saved.splice(i, 1);
+  localStorage.setItem("stories", JSON.stringify(saved));
+  viewStories();
+}
+
+function readStory() {
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(storyText.innerText);
+  speech.rate = 0.85;
+  speech.pitch = 1;
+
+  const voices = speechSynthesis.getVoices();
+  const femaleVoice = voices.find(v =>
+    v.name.toLowerCase().includes("female") ||
+    v.name.includes("Google UK English Female")
+  );
+
+  if (femaleVoice) speech.voice = femaleVoice;
+
+  currentSpeech = speech;
+  speechSynthesis.speak(speech);
+}
+
+function pauseStory() { speechSynthesis.pause(); }
+function resumeStory() { speechSynthesis.resume(); }
+function stopStory() { speechSynthesis.cancel(); }
+
+async function generateStory() {
+
+  const btn = document.getElementById("generateBtn");
+  const loading = document.getElementById("loadingText");
+
+  if (btn.disabled) return;
+
+  btn.disabled = true;
+  btn.innerText = "✨ Creating your child's story...";
+
+  const messages = [
+    "✨ Creating a magical bedtime journey...",
+    "🌙 Gently weaving your story...",
+    "📖 Adding a touch of wonder..."
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    loading.innerText = messages[i % messages.length];
+    i++;
+  }, 1500);
+
+  try {
+    const name = document.getElementById("name").value.trim() || "A child";
+    const companion = document.getElementById("companion").value.trim() || "a friend";
+
+    const response = await fetch("/api/story", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        companion,
+        selections,
+        length: selections.length
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.story) throw new Error("No story returned");
+
+    const parts = data.story.split("\n\n");
+
+    storyTitle.innerText = parts[0].replace(/[#*]/g, "");
+    storyText.innerText = parts.slice(1).join("\n\n");
+
+    storyCard.classList.remove("hidden");
+
+    document.body.style.background = "#2d1b4d";
+
+  } catch (err) {
+    alert("Something went wrong. Try again.");
+    console.error(err);
+  }
+
+  clearInterval(interval);
+  loading.innerText = "";
+  btn.disabled = false;
+  btn.innerText = "Create Story";
+}
+
+</script>
+
+</body>
+</html>
