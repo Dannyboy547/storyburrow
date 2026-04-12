@@ -1,0 +1,89 @@
+import Stripe from "stripe";
+import admin from "firebase-admin";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
+
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    }),
+  });
+}
+
+const db = admin.firestore();
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function buffer(readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
+
+  const sig = req.headers["stripe-signature"];
+  const buf = await buffer(req);
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      buf,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error("Webhook verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle successful subscription payments
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const email = session.customer_details?.email;
+
+    if (!email) {
+      return res.status(400).send("No email found.");
+    }
+
+    try {
+      // Find Firebase user by email
+      const userRecord = await admin.auth().getUserByEmail(email);
+      const uid = userRecord.uid;
+
+      // Grant premium access
+      await db.collection("users").doc(uid).set(
+        {
+          email: email,
+          isPremium: true,
+          stripeCustomerId: session.customer,
+          subscriptionId: session.subscription,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      console.log(`Premium granted to ${email}`);
+    } catch (error) {
+      console.error("Error granting premium:", error);
+    }
+  }
+
+  res.status(200).json({ received: true });
+}
