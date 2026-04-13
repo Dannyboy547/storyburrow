@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StoryBurrow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #7b5cff, #b58cff, #f3d1ff);
+  margin: 0;
+  padding: 0;
+  color: #2d1f3f;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  padding: 15px;
+}
+
+.logo {
+  width: 360px;
+  max-width: 95%;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.6));
+}
+
+.subtitle {
+  text-align: center;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.subtext {
+  text-align: center;
+  color: white;
+  opacity: 0.8;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 18px;
+  margin: 15px 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #7b5cff, #d96fff);
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.option {
+  display: inline-block;
+  padding: 10px 14px;
+  margin: 5px;
+  border-radius: 20px;
+  border: 2px solid #c9a7ff;
+  cursor: pointer;
+}
+
+.option.active {
+  background: linear-gradient(135deg, #7b5cff, #d96fff);
+  color: white;
+  border: none;
+}
+
+.section-title {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.hidden { display: none; }
+
+#storyText {
+  white-space: pre-line;
+  line-height: 1.7;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div style="text-align:center;">
+    <img src="Logo.png.PNG" class="logo" alt="StoryBurrow Logo">
+  </div>
+
+  <h2 class="subtitle">🌙 A magical bedtime story, made just for your child</h2>
+  <p class="subtext">Personalised. Calming. Ready in seconds.</p>
+
+  <div class="card">
+    <h3>✨ Welcome to StoryBurrow</h3>
+    <p style="font-size:14px; line-height:1.6;">
+      Create magical, personalised bedtime stories in seconds.
+    </p>
+    <ol style="font-size:14px; padding-left:18px;">
+      <li>Sign up or log in.</li>
+      <li>Enter your child's name.</li>
+      <li>Choose characters, worlds, and moods.</li>
+      <li>Generate and save your story.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+
+```
+<div id="authSection">
+  <input id="email" placeholder="Email" autocomplete="email">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <label style="font-size:12px;">
+    <input type="checkbox" onclick="togglePassword()"> Show Password
+  </label>
+  <button onclick="signUp()" class="primary-btn">Sign Up</button>
+  <button onclick="login()" class="primary-btn">Login</button>
+  <button onclick="logout()" class="primary-btn hidden" id="logoutBtn">Logout</button>
+</div>
+
+<p style="font-size:12px; text-align:center; opacity:0.7;">
+  New to StoryBurrow? Sign up to save and revisit your magical stories anytime.
+</p>
+
+<input id="name" placeholder="Child's Name">
+<input id="companion" placeholder="Optional: Companion">
+
+<button onclick="viewStories()" class="primary-btn">📚 My Story Library</button>
+
+<div class="section-title">Favourite Character</div>
+<div id="character">
+  <span class="option active" onclick="select(this,'character')">🐉 Dragon</span>
+  <span class="option" onclick="select(this,'character')">🦁 Lion</span>
+  <span class="option" onclick="select(this,'character')">🦄 Unicorn</span>
+  <span class="option" onclick="select(this,'character')">🐻 Bear</span>
+  <span class="option" onclick="select(this,'character')">🐺 Wolf</span>
+  <span class="option" onclick="select(this,'character')">🦊 Fox</span>
+  <span class="option" onclick="select(this,'character')">🐬 Dolphin</span>
+  <span class="option" onclick="select(this,'character')">🦋 Butterfly</span>
+  <span class="option" onclick="select(this,'character')">🐧 Penguin</span>
+  <span class="option" onclick="select(this,'character')">🐘 Elephant</span>
+  <span class="option" onclick="select(this,'character')">🦉 Owl</span>
+  <span class="option" onclick="select(this,'character')">🐸 Frog</span>
+  <span class="option" onclick="select(this,'character')">🦖 Dinosaur</span>
+</div>
+
+<div class="section-title">World</div>
+<div id="world">
+  <span class="option active" onclick="select(this,'world')">🌲 Enchanted Forest</span>
+  <span class="option" onclick="select(this,'world')">🚀 Space</span>
+  <span class="option" onclick="select(this,'world')">🏰 Castle Kingdom</span>
+  <span class="option" onclick="select(this,'world')">🌊 Ocean</span>
+  <span class="option" onclick="select(this,'world')">🎪 Magic Circus</span>
+  <span class="option" onclick="select(this,'world')">🌈 Dream World</span>
+  <span class="option" onclick="select(this,'world')">🏡 Cosy Village</span>
+  <span class="option" onclick="select(this,'world')">🏜 Desert Adventure</span>
+  <span class="option" onclick="select(this,'world')">❄️ Snowy Mountains</span>
+  <span class="option" onclick="select(this,'world')">🌋 Volcano Island</span>
+  <span class="option" onclick="select(this,'world')">🧙 Wizard School</span>
+  <span class="option" onclick="select(this,'world')">🚂 Adventure Train</span>
+</div>
+
+<div class="section-title">Story Type</div>
+<div id="type">
+  <span class="option active" onclick="select(this,'type')">🌙 Night</span>
+  <span class="option" onclick="select(this,'type')">☀️ Day</span>
+</div>
+
+<div class="section-title">Mood</div>
+<div id="mood">
+  <span class="option active" onclick="select(this,'mood')">😴 Calm bedtime</span>
+  <span class="option" onclick="select(this,'mood')">😂 Funny & silly</span>
+  <span class="option" onclick="select(this,'mood')">💪 Brave & inspiring</span>
+  <span class="option" onclick="select(this,'mood')">💖 Warm & cosy</span>
+</div>
+
+<div class="section-title">Length</div>
+<div id="length">
+  <span class="option active" onclick="select(this,'length')">Short (2–3 mins)</span>
+  <span class="option" onclick="select(this,'length')">Medium (5–6 mins)</span>
+  <span class="option" onclick="select(this,'length')">Long (8–10 mins)</span>
+</div>
+
+<button id="generateBtn" class="primary-btn" onclick="generateStory()">✨ Create Story</button>
+
+<p style="font-size:12px; opacity:0.7; text-align:center;">
+  ✨ Loved by parents for calm, magical bedtime routines
+</p>
+
+<p id="loadingText" style="text-align:center;"></p>
+```
+
+  </div>
+
+  <div id="storyCard" class="card hidden">
+    <h2 id="storyTitle"></h2>
+    <p id="storyText"></p>
+
+```
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+  <button onclick="readStory()" class="primary-btn">🔊 Quick Read (Basic Voice)</button>
+  <button onclick="pauseStory()" class="primary-btn">⏸ Pause</button>
+  <button onclick="resumeStory()" class="primary-btn">▶️ Resume</button>
+  <button onclick="stopStory()" class="primary-btn">⏹ Stop</button>
+</div>
+<button onclick="downloadStory()" class="primary-btn">⬇️ Download Story</button>
+<button onclick="saveStory()" class="primary-btn">💾 Save Story</button>
+```
+
+  </div>
+
+  <div id="libraryCard" class="card hidden">
+    <h3>📚 My Story Library</h3>
+    <div id="savedStoriesList"></div>
+  </div>
+
+</div>
+
+<div id="upgradeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000;">
+  <div style="background:white; padding:20px; max-width:300px; margin:100px auto; border-radius:10px; text-align:center;">
+    <h2>Unlock Premium ✨</h2>
+    <p id="upgradeText">Long stories are available for premium members only.</p>
+    <button onclick="goToUpgrade()" class="primary-btn">Start unlimited stories for £3.99/month ✨</button>
+    <br><br>
+    <button onclick="restoreMembership()" class="primary-btn" style="background:#eee; color:#333;">Already subscribed? Restore access</button>
+    <br><br>
+    <button onclick="closeModal()" style="background:none; border:none; color:#777;">Not now</button>
+  </div>
+</div>
+
+<!-- ✅ Firebase module script -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    query,
+    where,
+    orderBy,
+    getDoc,
+    setDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD1KNVRV56G-oMFXqDCEpA8HOqjr6yTBEg",
+    authDomain: "storyburrow-f4b98.firebaseapp.com",
+    projectId: "storyburrow-f4b98",
+    storageBucket: "storyburrow-f4b98.firebasestorage.app",
+    messagingSenderId: "747255294092",
+    appId: "1:747255294092:web:518b754f3636616a1533a9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Auth
+  window._auth = auth;
+  window._createUser = createUserWithEmailAndPassword;
+  window._signIn = signInWithEmailAndPassword;
+  window._signOut = signOut;
+
+  // Firestore
+  window._db = db;
+  window._collection = collection;
+  window._addDoc = addDoc;
+  window._getDocs = getDocs;
+  window._deleteDoc = deleteDoc;
+  window._doc = doc;
+  window._query = query;
+  window._where = where;
+  window._orderBy = orderBy;
+  window._getDoc = getDoc;
+  window._setDoc = setDoc;
+  window._serverTimestamp = serverTimestamp;
+
+  // ✅ onAuthStateChanged inside module where auth is ready
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      window.currentUser = user;
+      const userRef = window._doc(window._db, "users", user.uid);
+      const userSnap = await window._getDoc(userRef);
+
+      if (userSnap.exists()) {
+        window.isPremium = userSnap.data().isPremium === true;
+      } else {
+        window.isPremium = false;
+
+       await window._setDoc(userRef, {
+  email: user.email,
+  isPremium: false,
+  createdAt: window._serverTimestamp()
+}, { merge: true });
+
+      console.log("Premium Status:", window.isPremium);
+      console.log("User logged in:", user.email);
+      console.log("UID:", user.uid);
+
+      document.getElementById("logoutBtn").classList.remove("hidden");
+      document.getElementById("email").classList.add("hidden");
+      document.getElementById("password").classList.add("hidden");
+
+      // Automatically load stories
+      viewStories();
+    } else {
+      window.currentUser = null;
+      window.isPremium = false;
+      console.log("No user logged in");
+
+      document.getElementById("logoutBtn").classList.add("hidden");
+      document.getElementById("email").classList.remove("hidden");
+      document.getElementById("password").classList.remove("hidden");
+    }
+  });
+</script>
+
+<!-- ✅ Main app script -->
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+  let selections = {
+    character: "Dragon",
+    world: "Enchanted Forest",
+    mood: "Calm bedtime",
+    type: "Night",
+    length: "Short"
+  };
+
+  function select(el, type) {
+    const parent = el.parentElement;
+    Array.from(parent.children).forEach(c => c.classList.remove("active"));
+    el.classList.add("active");
+    selections[type] = el.innerText.split(" (")[0];
+  }
+
+  function togglePassword() {
+    const passwordField = document.getElementById("password");
+    passwordField.type = passwordField.type === "password" ? "text" : "password";
+  }
+
+  async function signUp() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const userCredential = await window._createUser(window._auth, email, password);
+      const user = userCredential.user;
+
+      await window._setDoc(
+        window._doc(window._db, "users", user.uid),
+        {
+          email: user.email,
+          isPremium: false,
+          createdAt: window._serverTimestamp()
+        }
+      );
+
+      alert("Account created successfully! ✨");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    window._signIn(window._auth, email, password)
+      .then(() => alert("Logged in!"))
+      .catch(err => alert(err.message));
+  }
+
+  function logout() {
+    window._signOut(window._auth).then(() => alert("Logged out"));
+  }
+
+  function openUpgradeModal(message) {
+    document.getElementById("upgradeText").innerText = message;
+    document.getElementById("upgradeModal").style.display = "block";
+  }
+
+  async function restoreMembership() {
+    if (!window.currentUser) {
+      alert("Please log in to restore your subscription.");
+      return;
+    }
+
+    try {
+      const userRef = window._doc(window._db, "users", window.currentUser.uid);
+      const userSnap = await window._getDoc(userRef);
+
+      if (userSnap.exists() && userSnap.data().isPremium === true) {
+        window.isPremium = true;
+        alert("✨ Premium access restored!");
+        closeModal();
+      } else {
+        alert("No active subscription found.");
+      }
+    } catch (error) {
+      console.error("Error restoring subscription:", error);
+      alert("Unable to verify subscription. Please try again.");
+    }
+  }
+
+  function closeModal() {
+    document.getElementById("upgradeModal").style.display = "none";
+  }
+
+  function goToUpgrade() {
+    window.location.href = "https://buy.stripe.com/4gMcN7bprcOldmVfSsc7u00";
+  }
+
+  function hasUsedFreeStoryToday() {
+    const lastUsed = localStorage.getItem("lastStoryDate");
+    const today = new Date().toDateString();
+    return lastUsed === today;
+  }
+
+  function markStoryUsed() {
+    const today = new Date().toDateString();
+    localStorage.setItem("lastStoryDate", today);
+  }
+
+  // ✅ Firestore save
+  async function saveStory() {
+    if (!window.currentUser) {
+      alert("Please log in to save stories ✨");
+      return;
+    }
+
+    const story = {
+      title: document.getElementById("storyTitle").innerText,
+      text: document.getElementById("storyText").innerText,
+      userId: window.currentUser.uid,
+      createdAt: window._serverTimestamp()
+    };
+
+    try {
+      await window._addDoc(
+        window._collection(window._db, "stories"),
+        story
+      );
+      alert("Story saved to your account! ✨");
+      viewStories();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save story");
+    }
+  }
+
+  function downloadStory() {
+    const text = document.getElementById("storyTitle").innerText + "\n\n" + document.getElementById("storyText").innerText;
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "story.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ✅ Firestore view
+  async function viewStories() {
+    if (!window.currentUser) {
+      alert("Please log in to view your stories ✨");
+      return;
+    }
+
+    const list = document.getElementById("savedStoriesList");
+    list.innerHTML = "Loading...";
+
+    try {
+      const q = window._query(
+        window._collection(window._db, "stories"),
+        window._where("userId", "==", window.currentUser.uid),
+        window._orderBy("createdAt", "desc")
+      );
+      const querySnapshot = await window._getDocs(q);
+
+      list.innerHTML = "";
+      const userStories = [];
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        userStories.push({ id: docSnap.id, ...data });
+      });
+
+      if (!userStories.length) {
+        list.innerHTML = "<p>No saved stories yet.</p>";
+        return;
+      }
+
+      userStories.forEach((s) => {
+        const div = document.createElement("div");
+        div.style.borderBottom = "1px solid #eee";
+        div.style.paddingBottom = "10px";
+        div.style.marginBottom = "10px";
+
+        const title = document.createElement("strong");
+        title.textContent = s.title;
+
+        const readBtn = document.createElement("button");
+        readBtn.className = "primary-btn";
+        readBtn.textContent = "📖 Read";
+        readBtn.onclick = () => loadStoryFromDB(s.title, s.text);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "primary-btn";
+        deleteBtn.textContent = "🗑 Delete";
+        deleteBtn.onclick = () => deleteStoryFromDB(s.id);
+
+        div.append(title, document.createElement("br"), document.createElement("br"), readBtn, deleteBtn);
+        list.appendChild(div);
+      });
+
+      document.getElementById("libraryCard").classList.remove("hidden");
+
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = "Failed to load stories";
+    }
+  }
+
+  // ✅ Load from Firestore into view
+  function loadStoryFromDB(title, text) {
+    document.getElementById("storyTitle").innerText = title;
+    document.getElementById("storyText").innerText = text;
+
+    document.getElementById("storyCard").classList.remove("hidden");
+    document.getElementById("libraryCard").classList.remove("hidden");
+
+    // Scroll to the story for better UX
+    document.getElementById("storyCard").scrollIntoView({
+      behavior: "smooth"
+    });
+  }
+
+  // ✅ Delete from Firestore
+  async function deleteStoryFromDB(id) {
+    try {
+      await window._deleteDoc(
+        window._doc(window._db, "stories", id)
+      );
+      alert("Story deleted");
+      viewStories();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete");
+    }
+  }
+
+  let currentSpeech = null;
+
+  function readStory() {
+    speechSynthesis.cancel();
+
+    const text =
+      document.getElementById("storyTitle").innerText + ". " +
+      document.getElementById("storyText").innerText;
+
+    if (!text.trim()) return;
+
+    currentSpeech = new SpeechSynthesisUtterance(text);
+    currentSpeech.rate = 0.85;
+    currentSpeech.pitch = 1;
+
+    function setVoice() {
+      const voices = speechSynthesis.getVoices();
+
+      // Preferred calm female voices
+      const preferredVoices = [
+        "Google UK English Female",
+        "Microsoft Sonia Online (Natural)",
+        "Microsoft Libby Online (Natural)",
+        "Samantha",
+        "Karen",
+        "Serena"
+      ];
+
+      let selectedVoice = voices.find(v =>
+        preferredVoices.includes(v.name)
+      );
+
+      // Fallback: any English (UK) female voice
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v =>
+          v.lang === "en-GB" && v.name.toLowerCase().includes("female")
+        );
+      }
+
+      // Fallback: any British voice
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.lang === "en-GB");
+      }
+
+      // Final fallback
+      if (!selectedVoice) {
+        selectedVoice = voices[0];
+      }
+
+      currentSpeech.voice = selectedVoice;
+      currentSpeech.rate = 0.9;
+      currentSpeech.pitch = 1.1;
+      currentSpeech.volume = 1;
+
+      speechSynthesis.speak(currentSpeech);
+    }
+
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.onvoiceschanged = setVoice;
+    } else {
+      setVoice();
+    }
+  }
+
+  function pauseStory() {
+    speechSynthesis.pause();
+  }
+
+  function resumeStory() {
+    if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+    } else {
+      readStory(); // fallback for mobile devices
+    }
+  }
+
+  function stopStory() {
+    speechSynthesis.cancel();
+  }
+
+  async function generateStory() {
+    const btn = document.getElementById("generateBtn");
+    const loading = document.getElementById("loadingText");
+    if (!btn || !loading) return;
+
+    const isPremium = window.isPremium;
+    const selectedLength = selections.length.toLowerCase();
+
+    if (!isPremium && selectedLength.includes("long")) {
+      openUpgradeModal("Long stories are for premium users only ✨");
+      return;
+    }
+
+    if (!isPremium && hasUsedFreeStoryToday()) {
+      openUpgradeModal("You've used your free story today. Upgrade for unlimited stories 🚀");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "✨ Creating your child's story...";
+
+    const messages = [
+      "✨ Creating a magical bedtime journey...",
+      "🌙 Gently weaving your story...",
+      "📖 Adding a touch of wonder..."
+    ];
+
+    let i = 0;
+    loading.innerText = messages[0];
+
+    const interval = setInterval(() => {
+      i++;
+      loading.innerText = messages[i % messages.length];
+    }, 1500);
+
+    let data;
+
+    try {
+      const name = document.getElementById("name").value.trim() || "A child";
+      const companion = document.getElementById("companion").value.trim() || "a friend";
+
+      if (!name.trim()) {
+        alert("Please enter your child's name ✨");
+        btn.disabled = false;
+        btn.innerText = "✨ Create Story";
+        return;
+      }
+
+      const response = await fetch("/api/story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, companion, selections, length: selections.length })
+      });
+
+      if (!response.ok) throw new Error("API failed");
+      data = await response.json();
+
+    } catch (err) {
+      console.error("API failed:", err);
+      data = { story: "✨ Backup Story\n\nYour magical story couldn't load, but this still works!" };
+    }
+
+    clearInterval(interval);
+    loading.innerText = "";
+
+    const parts = data.story.split("\n\n");
+    document.getElementById("storyTitle").innerText = parts[0];
+    document.getElementById("storyText").innerText = parts.slice(1).join("\n\n");
+    document.getElementById("storyCard").classList.remove("hidden");
+
+    if (!isPremium) markStoryUsed();
+
+    btn.disabled = false;
+    btn.innerText = "✨ Create Story";
+  }
+
+  // Expose all functions globally
+  window.togglePassword = togglePassword;
+  window.select = select;
+  window.signUp = signUp;
+  window.login = login;
+  window.logout = logout;
+  window.generateStory = generateStory;
+  window.viewStories = viewStories;
+  window.saveStory = saveStory;
+  window.loadStoryFromDB = loadStoryFromDB;
+  window.deleteStoryFromDB = deleteStoryFromDB;
+  window.downloadStory = downloadStory;
+  window.readStory = readStory;
+  window.pauseStory = pauseStory;
+  window.resumeStory = resumeStory;
+  window.stopStory = stopStory;
+  window.restoreMembership = restoreMembership;
+  window.closeModal = closeModal;
+  window.goToUpgrade = goToUpgrade;
+</script>
+
+<footer style="text-align:center; color:white; font-size:12px; padding:20px;">
+  © 2026 StoryBurrow. All rights reserved.
+</footer>
+
+</body>
+</html>
