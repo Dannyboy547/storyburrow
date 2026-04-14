@@ -12,26 +12,27 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
-// Initialize Firebase Admin with env var validation
-if (!admin.apps.length) {
-  if (
-    !process.env.FIREBASE_PROJECT_ID ||
-    !process.env.FIREBASE_CLIENT_EMAIL ||
-    !process.env.FIREBASE_PRIVATE_KEY
-  ) {
-    throw new Error("Missing Firebase environment variables.");
+function initializeFirebase() {
+  if (!admin.apps.length) {
+    if (
+      !process.env.FIREBASE_PROJECT_ID ||
+      !process.env.FIREBASE_CLIENT_EMAIL ||
+      !process.env.FIREBASE_PRIVATE_KEY
+    ) {
+      throw new Error("Missing Firebase environment variables.");
+    }
+
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      }),
+    });
   }
 
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    }),
-  });
+  return admin.firestore();
 }
-
-const db = admin.firestore();
 
 export const config = {
   api: {
@@ -48,30 +49,32 @@ async function buffer(readable) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
-  }
-
-  const sig = req.headers["stripe-signature"];
-  if (!sig) {
-    return res.status(400).send("Missing Stripe signature.");
-  }
-
-  let event;
-
   try {
-    const buf = await buffer(req);
-    event = stripe.webhooks.constructEvent(
-      buf,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error("❌ Webhook verification failed:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    const db = initializeFirebase();
 
-  try {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const sig = req.headers["stripe-signature"];
+    if (!sig) {
+      return res.status(400).send("Missing Stripe signature.");
+    }
+
+    let event;
+
+    try {
+      const buf = await buffer(req);
+      event = stripe.webhooks.constructEvent(
+        buf,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("❌ Webhook verification failed:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
@@ -82,19 +85,12 @@ export default async function handler(req, res) {
           throw new Error("No email found in session.");
         }
 
-        let uid;
-
-        try {
-          const userRecord = await admin.auth().getUserByEmail(email);
-          uid = userRecord.uid;
-        } catch (err) {
-          console.error("User not found in Firebase:", email);
-          return res.status(200).json({ received: true });
-        }
+        const userRecord = await admin.auth().getUserByEmail(email);
+        const uid = userRecord.uid;
 
         await db.collection("users").doc(uid).set(
           {
-            email: email,
+            email,
             isPremium: true,
             stripeCustomerId: session.customer,
             subscriptionId: session.subscription,
@@ -120,6 +116,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ received: true });
   } catch (error) {
     console.error("🔥 Webhook processing error:", error);
-    return res.status(500).send("Internal Server Error");
+    return res.status(500).send(error.message);
   }
 }
