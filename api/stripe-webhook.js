@@ -1,12 +1,27 @@
 import Stripe from "stripe";
 import admin from "firebase-admin";
 
+// Temporary debug logs
+console.log("Stripe Secret Key:", !!process.env.STRIPE_SECRET_KEY);
+console.log("Stripe Webhook Secret:", !!process.env.STRIPE_WEBHOOK_SECRET);
+console.log("Firebase Project ID:", !!process.env.FIREBASE_PROJECT_ID);
+console.log("Firebase Client Email:", !!process.env.FIREBASE_CLIENT_EMAIL);
+console.log("Firebase Private Key:", !!process.env.FIREBASE_PRIVATE_KEY);
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin with env var validation
 if (!admin.apps.length) {
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    throw new Error("Missing Firebase environment variables.");
+  }
+
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
@@ -60,14 +75,22 @@ export default async function handler(req, res) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
-        const email = session.customer_details?.email;
+        const email =
+          session.customer_details?.email || session.customer_email;
 
         if (!email) {
           throw new Error("No email found in session.");
         }
 
-        const userRecord = await admin.auth().getUserByEmail(email);
-        const uid = userRecord.uid;
+        let uid;
+
+        try {
+          const userRecord = await admin.auth().getUserByEmail(email);
+          uid = userRecord.uid;
+        } catch (err) {
+          console.error("User not found in Firebase:", email);
+          return res.status(200).json({ received: true });
+        }
 
         await db.collection("users").doc(uid).set(
           {
@@ -75,8 +98,7 @@ export default async function handler(req, res) {
             isPremium: true,
             stripeCustomerId: session.customer,
             subscriptionId: session.subscription,
-            updatedAt:
-              admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           },
           { merge: true }
         );
