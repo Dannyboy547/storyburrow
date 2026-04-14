@@ -38,52 +38,66 @@ export default async function handler(req, res) {
   }
 
   const sig = req.headers["stripe-signature"];
-  const buf = await buffer(req);
+  if (!sig) {
+    return res.status(400).send("Missing Stripe signature.");
+  }
 
   let event;
 
   try {
+    const buf = await buffer(req);
     event = stripe.webhooks.constructEvent(
       buf,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error("Webhook verification failed:", err.message);
+    console.error("❌ Webhook verification failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle successful subscription payments
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const email = session.customer_details?.email;
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        const email = session.customer_details?.email;
 
-    if (!email) {
-      return res.status(400).send("No email found.");
+        if (!email) {
+          throw new Error("No email found in session.");
+        }
+
+        const userRecord = await admin.auth().getUserByEmail(email);
+        const uid = userRecord.uid;
+
+        await db.collection("users").doc(uid).set(
+          {
+            email: email,
+            isPremium: true,
+            stripeCustomerId: session.customer,
+            subscriptionId: session.subscription,
+            updatedAt:
+              admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+
+        console.log(`✅ Premium granted to ${email}`);
+        break;
+      }
+
+      case "invoice.paid": {
+        const invoice = event.data.object;
+        console.log("💰 Invoice paid:", invoice.id);
+        break;
+      }
+
+      default:
+        console.log(`ℹ️ Unhandled event type: ${event.type}`);
     }
 
-    try {
-      // Find Firebase user by email
-      const userRecord = await admin.auth().getUserByEmail(email);
-      const uid = userRecord.uid;
-
-      // Grant premium access
-      await db.collection("users").doc(uid).set(
-        {
-          email: email,
-          isPremium: true,
-          stripeCustomerId: session.customer,
-          subscriptionId: session.subscription,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-      console.log(`Premium granted to ${email}`);
-    } catch (error) {
-      console.error("Error granting premium:", error);
-    }
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("🔥 Webhook processing error:", error);
+    return res.status(500).send("Internal Server Error");
   }
-
-  res.status(200).json({ received: true });
 }
