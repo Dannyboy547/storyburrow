@@ -154,6 +154,9 @@ input {
   <button onclick="signUp()" class="primary-btn" id="signupBtn" disabled>Sign Up</button>
   <button onclick="login()" class="primary-btn" id="loginBtn" disabled>Login</button>
   <button onclick="logout()" class="primary-btn hidden" id="logoutBtn">Logout</button>
+  <button onclick="manageSubscription()" class="primary-btn hidden" id="manageBtn">
+    💳 Manage Subscription
+  </button>
   <p id="authLoading" style="text-align:center; font-size:12px; opacity:0.8;">
     <span class="spinner"></span> Connecting securely...
   </p>
@@ -336,7 +339,10 @@ input {
       const userSnap = await window._getDoc(userRef);
 
       if (userSnap.exists()) {
-        window.isPremium = userSnap.data().isPremium === true;
+        const data = userSnap.data();
+
+        window.isPremium = data.isPremium === true;
+        window.stripeCustomerId = data.stripeCustomerId || null;
       } else {
         window.isPremium = false;
 
@@ -351,6 +357,10 @@ input {
       console.log("User logged in:", user.email);
       console.log("UID:", user.uid);
 
+      if (window.stripeCustomerId) {
+        document.getElementById("manageBtn").classList.remove("hidden");
+      }
+
       document.getElementById("logoutBtn").classList.remove("hidden");
       document.getElementById("email").classList.add("hidden");
       document.getElementById("password").classList.add("hidden");
@@ -363,6 +373,7 @@ input {
       console.log("No user logged in");
 
       document.getElementById("logoutBtn").classList.add("hidden");
+      document.getElementById("manageBtn").classList.add("hidden");
       document.getElementById("email").classList.remove("hidden");
       document.getElementById("password").classList.remove("hidden");
     }
@@ -442,6 +453,31 @@ input {
   function openUpgradeModal(message) {
     document.getElementById("upgradeText").innerText = message;
     document.getElementById("upgradeModal").style.display = "block";
+  }
+
+  async function manageSubscription() {
+    if (!window.stripeCustomerId) {
+      alert("No subscription found.");
+      return;
+    }
+
+    const res = await fetch("/api/create-portal-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        customerId: window.stripeCustomerId,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Failed to open subscription portal.");
+    }
   }
 
   async function restoreMembership() {
@@ -807,6 +843,7 @@ input {
   window.pauseStory = pauseStory;
   window.resumeStory = resumeStory;
   window.stopStory = stopStory;
+  window.manageSubscription = manageSubscription;
   window.restoreMembership = restoreMembership;
   window.closeModal = closeModal;
   window.goToUpgrade = goToUpgrade;
