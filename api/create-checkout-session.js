@@ -19,10 +19,9 @@ export default async function handler(req, res) {
           quantity: 1,
         },
       ],
-      customer_email: email, // ✅ THIS FIXES YOUR EMAIL ISSUE
-      success_url:
-        "https://www.storyburrow.com/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "https://www.storyburrow.com/pricing",
+      customer_email: email,
+      success_url: "https://www.storyburrow.com/success.html",
+      cancel_url: "https://www.storyburrow.com",
     });
 
     res.status(200).json({ url: session.url });
